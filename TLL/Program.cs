@@ -102,7 +102,9 @@ namespace TLL
                 }
             } while (!CheckIfTrue);
 
-            XmlData.XML( jmeno,  liga,  mesto,  zeme,  datum,  teamAZaznam,  teamBZaznam,  vyherceZapasZaznam,  minutyZaznam);
+            
+
+            XmlData.XML(vyherce, jmeno,  liga,  mesto,  zeme, pocetZapasu, datum,  teamAZaznam,  teamBZaznam,  vyherceZapasZaznam,  minutyZaznam);
     }   
     static void Main(string[] args)
         
