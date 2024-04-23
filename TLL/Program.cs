@@ -1,37 +1,46 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel.Design;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml;
+using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TLL
 {
     internal class Program
-    {      
+    {
         static void NTurnament()
 
         {
-            string jmeno, liga, mesto, zeme,vyherce,teamA, teamB;
-            int pocetZapasu, delkaZapasu;
-            DateTime datum;
-            bool  TeamValid=false;
+            string teamA, teamB;
+            int delkaZapasu;
+            string vyherce = "";
             char  switchOdpoved;
             string vyherceZapas = "";
 
             Console.Clear();
 
-            jmeno = Utility.TextValidace("Jmeno Turnaje");
-            liga = Utility.TextValidace("Liga");
-            zeme = Utility.TextValidace("Zeme konani");
-            mesto = Utility.TextValidace("Mesto konani");
-            datum = Utility.DateValidace("Zadejte datum");
-            pocetZapasu = Utility.CisloValidace("Pocet zapasu");
+            string jmeno = Utility.TextValidace("Jmeno Turnaje");
+            string liga = Utility.TextValidace("Liga");
+            string zeme = Utility.TextValidace("Zeme konani");
+            string mesto = Utility.TextValidace("Mesto konani");
+            DateTime datum = Utility.DateValidace("Zadejte datum");
+
+            Console.Clear();
+
+            int pocetZapasu = Utility.CisloValidace("Pocet zapasu",20);
 
             string[] teamAZaznam = new string[pocetZapasu];
             string[] teamBZaznam = new string[pocetZapasu];
             string[] vyherceZapasZaznam = new string[pocetZapasu];
-
+            int[] minutyZaznam = new int[pocetZapasu];
 
             for (int i = 0; i < pocetZapasu; i++)
             {
+                Console.Clear();
+
+                bool TeamValid = false;
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine($"Prave zapisujete hodnoty pro zapas {i + 1}:");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -42,7 +51,7 @@ namespace TLL
                 teamBZaznam[i] = teamB;
 
                 Console.WriteLine("-----------Zvolte VYHERCE Zapasu------------");
-                Console.WriteLine("[A] - " +teamA + " [B] - "+teamB + " [D] -REMIZA/HRA ZRUSENA");
+                Console.WriteLine("[A]" +teamA + "\n[B]" + teamB + "\n[D] REMIZA/ZAPAS ZRUSEN");
                 do
                 {
                     switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar);
@@ -68,35 +77,34 @@ namespace TLL
                     }
                 } while (!TeamValid);
 
-              
-
-                delkaZapasu = Utility.CisloValidace("Delka zapasu v minutach");      
+                delkaZapasu = Utility.CisloValidace("Delka zapasu v minutach", 120);
+                minutyZaznam[i] = delkaZapasu;
             }
 
-
-            Console.WriteLine("\nInformace o turnaji:");
-            Console.WriteLine("Jmeno Turnaje: " + jmeno);
-            Console.WriteLine("Liga: " + liga);
-            Console.WriteLine("Zeme konani: " + zeme);
-            Console.WriteLine("Mesto konani: " + mesto);
-            Console.WriteLine("Datum konani: " + datum.ToString("dd/MM/yyyy"));
-            Console.WriteLine("Pocet zapasu: " + pocetZapasu);
-            Console.WriteLine("Vyherce: " + vyherce);
-            Console.WriteLine("\nVýsledky zápasů:");
-            for (int i = 0; i < pocetZapasu; i++)
+            bool CheckIfTrue=false;
+            do
             {
-                Console.WriteLine($"Zápas {i + 1}: Team A - {teamAZaznam[i]}, Team B - {teamBZaznam[i]}, Vítěz - {vyherceZapasZaznam[i]}");
-            }
+                Console.Clear();
 
+                for (int i = 0; i < pocetZapasu; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {vyherceZapasZaznam[i]}");
+                }
 
-            Console.WriteLine("\nStiskněte libovolnou klávesu pro pokračování...");
-            Console.ReadKey(true); // Čeká na stisknutí klávesy, než se pokračuje
-        
+                 int volbaVyherce = Utility.CisloValidace($"Cislo Vyherce [1-{pocetZapasu}]", pocetZapasu);
+                if (volbaVyherce <= pocetZapasu && volbaVyherce>0) { 
+                     vyherce = vyherceZapasZaznam[volbaVyherce - 1];
+                CheckIfTrue = true;
+                }
+                else
+                {
+                    CheckIfTrue=false;
+                }
+            } while (!CheckIfTrue);
 
-    }
-
-
-        static void Main(string[] args)
+            XmlData.XML( jmeno,  liga,  mesto,  zeme,  datum,  teamAZaznam,  teamBZaznam,  vyherceZapasZaznam,  minutyZaznam);
+    }   
+    static void Main(string[] args)
         
         {
 
@@ -107,8 +115,7 @@ namespace TLL
             Console.WriteLine("NOVY TURNAMENT - [N]");
             Console.WriteLine("VYPSAT TURNAMENT -  [V]");
             Console.WriteLine("VYMAZAT TURNAMENT - [R]");
-            
-                
+                 
               odpoved =  char.ToUpper(Console.ReadKey().KeyChar);
                 switch(odpoved)
                 {  
@@ -116,30 +123,23 @@ namespace TLL
                     case 'N':
                       
                         NTurnament();
-
                         break;
+
                     case 'V':
                        
                         break;
+
                     case 'W':
 
                         break;
+
                 default:
+
                         Utility.ErrorZprava("Zvolte spravnou moznost");
                         break;
-                }
-               
+                } 
 
             } while (odpoved != 'K');
-
-           
-
-
-
-
-
-
-
         }
     }
 }

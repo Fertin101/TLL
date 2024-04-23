@@ -26,7 +26,7 @@ namespace TLL
                 input = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Utility.ErrorZprava("Prosim vyplnte udaj");
+                    ErrorZprava("Prosim vyplnte udaj");
                 }
                 else
                 {
@@ -37,7 +37,7 @@ namespace TLL
             return input;
         }
 
-       public static int CisloValidace(string text)
+       public static int CisloValidace(string text, int max=int.MaxValue)
         {
             int input;
             bool check;
@@ -46,9 +46,10 @@ namespace TLL
                 Console.WriteLine("\nZadejte " + text + ":");
                 string userInput = Console.ReadLine();
                 check = int.TryParse(userInput, out input);
-                if (!check)
+                if (!check || input > max || input < 1)
                 {
-                    Utility.ErrorZprava("Zadejete prosim cislo");
+                    ErrorZprava("Zadejte prosim cislo, ktere je mensi nebo rovno " + max);
+                    check = false;
                 }
 
             } while (!check);
@@ -56,6 +57,7 @@ namespace TLL
         }
 
         public static DateTime DateValidace(string text)
+
         {
             DateTime datum;
             string inputCislo;
@@ -63,7 +65,7 @@ namespace TLL
             do
 
             {
-                Console.Write(text+"(DD/MM/YYYY):");
+                Console.Write(text + "(DD/MM/YYYY):");
                 inputCislo = Console.ReadLine();
                 isValid = DateTime.TryParseExact(inputCislo, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum);
                 if (!isValid)
