@@ -16,6 +16,8 @@ namespace TLL
             char  switchOdpoved;
             string vyherceZapas = "";
 
+            Console.Clear();
+
             jmeno = Utility.TextValidace("Jmeno Turnaje");
             liga = Utility.TextValidace("Liga");
             zeme = Utility.TextValidace("Zeme konani");
@@ -71,7 +73,6 @@ namespace TLL
                 delkaZapasu = Utility.CisloValidace("Delka zapasu v minutach");      
             }
 
-            vyherce = Utility.TextValidace("Vyherce");
 
             Console.WriteLine("\nInformace o turnaji:");
             Console.WriteLine("Jmeno Turnaje: " + jmeno);
