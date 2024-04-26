@@ -16,7 +16,7 @@ namespace TLL
             string teamA, teamB;
             int delkaZapasu;
             string vyherce = "";
-            char  switchOdpoved;
+            char switchOdpoved;
             string vyherceZapas = "";
 
             Console.Clear();
@@ -29,7 +29,7 @@ namespace TLL
 
             Console.Clear();
 
-            int pocetZapasu = Utility.CisloValidace("Pocet zapasu",20);
+            int pocetZapasu = Utility.CisloValidace("Pocet zapasu", 20);
 
             string[] teamAZaznam = new string[pocetZapasu];
             string[] teamBZaznam = new string[pocetZapasu];
@@ -43,6 +43,7 @@ namespace TLL
                 bool TeamValid = false;
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine($"Prave zapisujete hodnoty pro zapas {i + 1}:");
+                Console.WriteLine("Pocet zapasu " + pocetZapasu);
                 Console.ForegroundColor = ConsoleColor.White;
 
                 teamA = Utility.TextValidace("Team A");
@@ -51,7 +52,7 @@ namespace TLL
                 teamBZaznam[i] = teamB;
 
                 Console.WriteLine("-----------Zvolte VYHERCE Zapasu------------");
-                Console.WriteLine("[A]" +teamA + "\n[B]" + teamB + "\n[D] REMIZA/ZAPAS ZRUSEN");
+                Console.WriteLine("[A]" + teamA + "\n[B]" + teamB + "\n[D] REMIZA/ZAPAS ZRUSEN");
                 do
                 {
                     switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar);
@@ -59,8 +60,8 @@ namespace TLL
                     {
                         case 'A':
                             vyherceZapas = teamA;
-                            vyherceZapasZaznam[i] =teamA ;
-                            TeamValid=true;
+                            vyherceZapasZaznam[i] = teamA;
+                            TeamValid = true;
                             break;
                         case 'B':
                             vyherceZapas = teamB;
@@ -68,7 +69,7 @@ namespace TLL
                             TeamValid = true;
                             break;
                         case 'D':
-                            vyherceZapasZaznam[i] ="DNF";
+                            vyherceZapasZaznam[i] = "DNF";
                             TeamValid = true;
                             break;
                         default:
@@ -81,7 +82,7 @@ namespace TLL
                 minutyZaznam[i] = delkaZapasu;
             }
 
-            bool CheckIfTrue=false;
+            bool CheckIfTrue = false;
             do
             {
                 Console.Clear();
@@ -91,21 +92,19 @@ namespace TLL
                     Console.WriteLine($"{i + 1}. {vyherceZapasZaznam[i]}");
                 }
 
-                 int volbaVyherce = Utility.CisloValidace($"Cislo Vyherce [1-{pocetZapasu}]", pocetZapasu);
-                if (volbaVyherce <= pocetZapasu && volbaVyherce>0) { 
-                     vyherce = vyherceZapasZaznam[volbaVyherce - 1];
-                CheckIfTrue = true;
+                int volbaVyherce = Utility.CisloValidace($"Cislo Vyherce [1-{pocetZapasu}]", pocetZapasu);
+                if (volbaVyherce <= pocetZapasu && volbaVyherce > 0) {
+                    vyherce = vyherceZapasZaznam[volbaVyherce - 1];
+                    CheckIfTrue = true;
                 }
                 else
                 {
-                    CheckIfTrue=false;
+                    CheckIfTrue = false;
                 }
             } while (!CheckIfTrue);
 
-            
-
-            XmlData.XML(vyherce, jmeno,  liga,  mesto,  zeme, pocetZapasu, datum,  teamAZaznam,  teamBZaznam,  vyherceZapasZaznam,  minutyZaznam);
-    }   
+            XmlData.XML(vyherce, jmeno, liga, mesto, zeme, pocetZapasu, datum, teamAZaznam, teamBZaznam, vyherceZapasZaznam, minutyZaznam);
+        }
     static void Main(string[] args)
         
         {
@@ -113,7 +112,7 @@ namespace TLL
             char odpoved;
             do {
             Console.Clear();
-            Console.WriteLine("ISLoL v.1 ");
+            Console.WriteLine("Evidence Leauge of Legends turnaju");
             Console.WriteLine("NOVY TURNAMENT - [N]");
             Console.WriteLine("VYPSAT TURNAMENT -  [V]");
             Console.WriteLine("VYMAZAT TURNAMENT - [R]");
@@ -128,7 +127,7 @@ namespace TLL
                         break;
 
                     case 'V':
-                       
+                     
                         break;
 
                     case 'W':
@@ -136,8 +135,9 @@ namespace TLL
                         break;
 
                 default:
-
+                        Console.Clear();
                         Utility.ErrorZprava("Zvolte spravnou moznost");
+                        Console.ReadKey();
                         break;
                 } 
 

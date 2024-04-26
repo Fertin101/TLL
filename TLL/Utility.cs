@@ -70,7 +70,7 @@ namespace TLL
                 isValid = DateTime.TryParseExact(inputCislo, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum);
                 if (!isValid)
                 {
-                    Utility.ErrorZprava("Prosim zadejte spravne datum (20/08/2024)");
+                    ErrorZprava("Prosim zadejte spravne datum (20/08/2024)");
                 }
             } while (!isValid);
             return datum;

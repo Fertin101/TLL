@@ -1,56 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-
-namespace TLL
+﻿namespace TLL
 {
+    using System;
+    using System.IO;
+    using System.Xml.Linq; // Tento using direktiv zahrnuje potřebné třídy pro práci s XML
+
     internal class XmlData
     {
-        static public void XML(string vyherce ,string jmeno, string liga, string mesto, string zeme, int pocetZapasu, DateTime datum, string[] teamAZaznam, string[] teamBZaznam, string[] vyherceZapasZaznam, int[] minutyZaznam)
+        // Metoda pro přidání nového turnaje do XML souboru
+        public static void XML(string vyherce, string jmeno, string liga, string mesto, string zeme, int pocetZapasu, DateTime datum, string[] teamAZaznam, string[] teamBZaznam, string[] vyherceZapasZaznam, int[] minutyZaznam)
         {
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true; 
-
             string directoryPath = @"C:\Users\frant\Documents";
-            string filePath = Path.Combine(directoryPath, $"XML_K_{jmeno}.xml");
+            string filePath = Path.Combine(directoryPath, "TurnamentData.xml");
 
-            using (XmlWriter writer = XmlWriter.Create(filePath, settings))
+            // Inicializace XML dokumentu a kořenového elementu
+            XDocument doc;
+            XElement root;
+
+            // Kontrola, zda soubor existuje
+            if (File.Exists(filePath))
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Turnament");
-                writer.WriteElementString("Nazev", jmeno);
-                writer.WriteElementString("Vyherce", vyherce);
-                writer.WriteStartElement("Lokace");
-                writer.WriteElementString("Zeme", zeme);
-                writer.WriteElementString("Mesto", mesto);
-                writer.WriteEndElement(); // Konec lokace
-                writer.WriteElementString("Datum", datum.ToString("yyyy-MM-dd"));
-                writer.WriteStartElement("Zapasy");
-                writer.WriteElementString("Pocet_zapasu", pocetZapasu.ToString());
-
-                for (int i = 0; i < pocetZapasu; i++)
-                {
-                    writer.WriteStartElement("Zapas"); 
-                    writer.WriteAttributeString("Cislo", (i+1).ToString());
-                    writer.WriteElementString("Tym_A", teamAZaznam[i]);
-                    writer.WriteElementString("Tym_B", teamBZaznam[i]);
-                    writer.WriteElementString("Vitez", vyherceZapasZaznam[i]);
-                    writer.WriteElementString("Delka", minutyZaznam[i].ToString());
-                    writer.WriteEndElement(); // konec zapasu
-                }
-
-                writer.WriteEndElement(); // konec zapasy
-                writer.WriteEndElement(); // konec turnament
-                writer.WriteEndDocument();
-
-                writer.Flush();
+                doc = XDocument.Load(filePath); // Načtení existujícího dokumentu
+                root = doc.Element("Turnaje") ?? new XElement("Turnaje"); // Použij existující nebo vytvoř nový kořen
             }
+            else
+            {
+                doc = new XDocument(); // Vytvoř nový dokument, pokud neexistuje
+                root = new XElement("Turnaje"); // Vytvoř kořenový element "Turnaje"
+                doc.Add(root); // Přidej kořenový element do dokumentu
+            }
+
+            // Vytvoření elementu turnaje s všemi detaily
+            XElement turnaj = new XElement("Turnaj",
+                new XElement("Jmeno", jmeno),
+                new XElement("Liga", liga),
+                new XElement("Vyherce", vyherce),
+                new XElement("Lokace",
+                    new XElement("Zeme", zeme),
+                    new XElement("Mesto", mesto)
+                ),
+                new XElement("Datum", datum.ToString("yyyy-MM-dd")),
+                new XElement("Zapasy", new XAttribute("Pocet", pocetZapasu.ToString()))
+            );
+
+            // Přidání detailů o zápasech do turnaje
+            for (int i = 0; i < pocetZapasu; i++)
+            {
+                XElement zapas = new XElement("Zapas",
+                    new XAttribute("Cislo", i + 1),
+                    new XElement("Tym_A", teamAZaznam[i]),
+                    new XElement("Tym_B", teamBZaznam[i]),
+                    new XElement("Vyherce", vyherceZapasZaznam[i]),
+                    new XElement("Delka_trvani_minuty", minutyZaznam[i].ToString())
+                );
+                turnaj.Element("Zapasy").Add(zapas); // Přidej každý zápas do "Zapasy" v turnaji
+            }
+
+            root.Add(turnaj); // Přidej kompletní turnaj do kořenového elementu
+            doc.Save(filePath); // Ulož dokument na specifikovanou cestu
+        }
     }
-}
 }
