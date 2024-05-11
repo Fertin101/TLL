@@ -1,9 +1,7 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-using System.Globalization;
-using System.Net.Http.Headers;
-using System.Xml.Serialization;
+﻿using System.Globalization;
 
-namespace LoLTurnaje
+
+namespace TLL
 {
 
     internal class Program
@@ -190,6 +188,7 @@ namespace LoLTurnaje
                 Console.WriteLine("--------------------------");
                 Console.WriteLine("[N] - NOVY TURNAMENT");
                 Console.WriteLine("[V] - VYPSAT TURNAMENTY");
+                Console.WriteLine("[V] - SMAZAT TURNAMENT");
                 Console.WriteLine("[O] - UMISTENI SOUBORU");
                 Console.WriteLine("[K] - UKONCIT PROGRAM");
                 Console.WriteLine("--------------------------");
