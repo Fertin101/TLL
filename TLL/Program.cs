@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Xml;
+using System.Xml.Linq;
 
 
 namespace TLL
@@ -109,14 +111,78 @@ namespace TLL
 
             return turnament;
         }
+        private static string xmlFilePath = @"C:\Users\frant\Documents\TurnamentData.xml";
 
-        static void CtiXml()
+        static void SmazXml()
+         {
+            XDocument doc = XDocument.Load(xmlFilePath);
+            var turnaje = doc.Descendants("Turnaj").ToList();
+
+            Console.Clear();
+
+            for (int i = 0;i < turnaje.Count; i++)
+            {
+                Console.WriteLine($"{i+1} - {turnaje[i].Element("Jmeno").Value} ");
+            }
+            int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
+
+            turnaje[volbaSmaz - 1].Remove();
+            doc.Save(xmlFilePath);
+            Console.WriteLine($"Turnaj {turnaje[volbaSmaz - 1]} byl smazán ");
+            Console.ReadKey();
+        }
+        static void UlozXml(TTurnament turnament)
         {
+            //Inicializace XML dokumentu a kořenového elementu
+            XDocument doc;
+            XElement root;
 
+            // Kontrola, zda soubor existuje
+            if (File.Exists(xmlFilePath))
+            {
+                doc = XDocument.Load(xmlFilePath); // Načtení existujícího dokumentu
+                root = doc.Element("Turnaje") ?? new XElement("Turnaje"); // Použij existující nebo vytvoř nový kořen
+            }
+            else
+            {
+                doc = new XDocument(); // Vytvoř nový dokument, pokud neexistuje
+                root = new XElement("Turnaje"); // Vytvoř kořenový element "Turnaje"
+                doc.Add(root); // Přidej kořenový element do dokumentu
+            }
 
+            // Vytvoření elementu turnaje s všemi detaily
+            XElement turnaj = new XElement("Turnaj",
+                new XElement("Jmeno", turnament.jmeno),
+                new XElement("Liga", turnament.liga),
+                new XElement("Vyherce", turnament.vyherceTur),
+                new XElement("Lokace",
+                    new XElement("Zeme", turnament.zeme),
+                    new XElement("Mesto", turnament.mesto)
+                ),
+                new XElement("Datum", turnament.datum.ToString("yyyy-MM-dd")),
+                new XElement("Zapasy", new XAttribute("Pocet", turnament.pocetZap.ToString()))
+            );
+
+            // Přidání detailů o zápasech do turnaje
+            for (int i = 0; i < turnament.pocetZap; i++)
+            {
+                XElement zapas = new XElement("Zapas",
+                    new XAttribute("Cislo", i + 1),
+                    new XElement("Tym_A", turnament.teamA[i]),
+                    new XElement("Tym_B", turnament.teamB[i]),
+                    new XElement("Vyherce", turnament.vyherceZap[i]),
+                    new XElement("Delka_trvani_minuty", turnament.delkaZap[i].ToString())
+
+                );
+                turnaj.Element("Zapasy").Add(zapas); // Přidej zápas do "Zapasy" v turnaji
+            }
+
+            root.Add(turnaj); // Přidej kompletní turnaj do kořenového elementu
+            doc.Save(xmlFilePath); // Ulož dokument na specifikovanou cestu
+            Console.WriteLine("Turnaj byl úspěšně přidán.");
         }
 
-        static string TextValidace(string text = "")
+        static string TextValidace(string text)
         {
             string input = "";
             bool check = true;
@@ -136,7 +202,7 @@ namespace TLL
             return input;
         }
 
-        static DateTime DatumValidace(string text = "")
+        static DateTime DatumValidace(string text)
         {
             DateTime datum;
             bool isValid;
@@ -154,7 +220,7 @@ namespace TLL
 
         }
 
-        static int CisloValidace(string text = "", int max = int.MaxValue)
+        static int CisloValidace(string text, int max)
         {
             int input;
             bool check;
@@ -171,13 +237,12 @@ namespace TLL
             } while (!check);
             return input;
         }
-        static void ErrorZprava(string text = "")
+        static void ErrorZprava(string text)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(text);
             Console.ForegroundColor = ConsoleColor.White;
         }
-
         static void Main(string[] args)
         {
             char odpoved;
@@ -188,25 +253,31 @@ namespace TLL
                 Console.WriteLine("--------------------------");
                 Console.WriteLine("[N] - NOVY TURNAMENT");
                 Console.WriteLine("[V] - VYPSAT TURNAMENTY");
-                Console.WriteLine("[V] - SMAZAT TURNAMENT");
+                Console.WriteLine("[S] - SMAZAT TURNAMENT");
                 Console.WriteLine("[O] - UMISTENI SOUBORU");
                 Console.WriteLine("[K] - UKONCIT PROGRAM");
                 Console.WriteLine("--------------------------");
 
                 odpoved = char.ToUpper(Console.ReadKey().KeyChar);
+
+                TTurnament novyTurnaj;
                 switch (odpoved)
                 {
 
                     case 'N':
-                        Pridat();
-
-                        Console.WriteLine("Turnaj byl úspěšně přidán.");
+                        novyTurnaj = Pridat();
+                        UlozXml(novyTurnaj);   
                         Console.ReadKey();
 
                         break;
                     case 'K':
                         Environment.Exit(0);
                         break;
+                    case 'S':
+                        
+                        SmazXml();
+                        break;
+                    
                     default:
                         Console.Clear();
                         ErrorZprava("Zvolte spravnou moznost");
