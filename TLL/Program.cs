@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Xml;
 using System.Xml.Linq;
 
 
@@ -24,134 +23,191 @@ namespace TLL
             public DateTime datum;
 
         }
+        private static string nazevXmlSouboru = "Data.xml";
+        private static string cestaXml = Path.Combine(Directory.GetCurrentDirectory(), nazevXmlSouboru);
         static TTurnament Pridat()
         {
             TTurnament turnament = new();
-
-            Console.Clear();
-
-            turnament.jmeno = TextValidace("Jmeno turnaje");
-            turnament.liga = TextValidace("Jmeno ligy");
-            turnament.zeme = TextValidace("Zeme konani");
-            turnament.mesto = TextValidace("Mesto konani");
-            turnament.datum = DatumValidace("Datum zacatku konani");
-
-            Console.Clear();
-
-            turnament.pocetZap = CisloValidace("Pocet zapasu v turnaji", 15);
-
-            turnament.teamA = new string[turnament.pocetZap];
-            turnament.teamB = new string[turnament.pocetZap];
-            turnament.delkaZap = new int[turnament.pocetZap];
-            turnament.vyherceZap = new string[turnament.pocetZap];
-
-            for (int i = 0; i < turnament.pocetZap; i++)
+            try
             {
                 Console.Clear();
 
-                bool teamCheck = false;
+                turnament.jmeno = TextValidace("Jmeno turnaje");
+                turnament.liga = TextValidace("Jmeno ligy");
+                turnament.zeme = TextValidace("Zeme konani");
+                turnament.mesto = TextValidace("Mesto konani");
+                turnament.datum = DatumValidace("Datum zacatku konani");
 
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine($"Prave zapisujete hodnoty pro zapas {i + 1}:");
-                Console.WriteLine("Pocet zapasu " + turnament.pocetZap);
-                Console.ForegroundColor = ConsoleColor.White;
-
-                string A = TextValidace("Nazev tymu A");
-                turnament.teamA[i] = A;
-                string B = TextValidace("Nazev tymu B");
-                turnament.teamB[i] = B;
-
-                Console.WriteLine("-----------Zvolte VYHERCE Zapasu------------");
-                Console.WriteLine("[A]" + A + "\n[B]" + B + "\n[D] REMIZA/ZAPAS ZRUSEN");
-                do
-                {
-                    char switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar);
-                    switch (switchOdpoved)
-                    {
-                        case 'A':
-                            turnament.vyherceZap[i] = A;
-                            teamCheck = true;
-                            break;
-                        case 'B':
-                            turnament.vyherceZap[i] = B;
-                            teamCheck = true;
-                            break;
-                        case 'D':
-                            turnament.vyherceZap[i] = "DNF";
-                            teamCheck = true;
-                            break;
-                        default:
-                            ErrorZprava("Zvolte jednu z moznosti!");
-                            break;
-                    }
-                } while (!teamCheck);
-
-                int delka = CisloValidace("Delka zapasu v minuach", 120);
-                turnament.delkaZap[i] = delka;
-            }
-
-            bool vyherceCheck = false;
-            do
-            {
                 Console.Clear();
+
+                turnament.pocetZap = CisloValidace("Pocet zapasu v turnaji", 15);
+
+                turnament.teamA = new string[turnament.pocetZap];
+                turnament.teamB = new string[turnament.pocetZap];
+                turnament.delkaZap = new int[turnament.pocetZap];
+                turnament.vyherceZap = new string[turnament.pocetZap];
 
                 for (int i = 0; i < turnament.pocetZap; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {turnament.vyherceZap[i]}");
-                }
+                    Console.Clear();
 
-                int volbaVyh = CisloValidace($"Cislo Vyherce Turnamentu [1-{turnament.pocetZap}]", turnament.pocetZap);
-                if (volbaVyh <= turnament.pocetZap && volbaVyh > 0)
+                    bool teamCheck = false;
+
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"Prave zapisujete hodnoty pro zapas {i + 1}:");
+                    Console.WriteLine("Pocet zapasu " + turnament.pocetZap);
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    string A = TextValidace("Nazev tymu A");
+                    turnament.teamA[i] = A;
+                    string B = TextValidace("Nazev tymu B");
+                    turnament.teamB[i] = B;
+
+                    Console.WriteLine("-----------Zvolte VYHERCE Zapasu------------");
+                    Console.WriteLine("[A]" + A + "\n[B]" + B + "\n[D] REMIZA/ZAPAS ZRUSEN");
+                    do
+                    {
+                        char switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar);
+                        switch (switchOdpoved)
+                        {
+                            case 'A':
+                                turnament.vyherceZap[i] = A;
+                                teamCheck = true;
+                                break;
+                            case 'B':
+                                turnament.vyherceZap[i] = B;
+                                teamCheck = true;
+                                break;
+                            case 'D':
+                                turnament.vyherceZap[i] = "DNF";
+                                teamCheck = true;
+                                break;
+                            default:
+                                ErrorZprava("Zvolte jednu z moznosti!");
+                                break;
+                        }
+                    } while (!teamCheck);
+
+                    int delka = CisloValidace("Delka zapasu v minuach", 120);
+                    turnament.delkaZap[i] = delka;
+                }
+                bool vyherceCheck = false;
+                do
                 {
-                    turnament.vyherceTur = turnament.vyherceZap[volbaVyh - 1];
-                    vyherceCheck = true;
-                }
+                    Console.Clear();
 
-            } while (!vyherceCheck);
+                    for (int i = 0; i < turnament.pocetZap; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {turnament.vyherceZap[i]}");
+                    }
 
-            return turnament;
-        }
-        private static string xmlFilePath = @"C:\Users\frant\Documents\TurnamentData.xml";
+                    int volbaVyh = CisloValidace($"Cislo Vyherce Turnamentu [1-{turnament.pocetZap}]", turnament.pocetZap);
+                    if (volbaVyh <= turnament.pocetZap && volbaVyh > 0)
+                    {
+                        turnament.vyherceTur = turnament.vyherceZap[volbaVyh - 1];
+                        vyherceCheck = true;
+                    }
 
-        static void SmazXml()
-         {
-            XDocument doc = XDocument.Load(xmlFilePath);
-            var turnaje = doc.Descendants("Turnaj").ToList();
-
-            Console.Clear();
-
-            for (int i = 0;i < turnaje.Count; i++)
-            {
-                Console.WriteLine($"{i+1} - {turnaje[i].Element("Jmeno").Value} ");
+                } while (!vyherceCheck);
+                return turnament;
             }
-            int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
+            catch (Exception e)
+            {
+                ErrorZprava($"Chyba pri vytvareni turnaje: {e.Message}");
+                return default;
+            }
+        }
+        static void SmazXml()
+        {
+            try
+            {
+                XDocument doc = XDocument.Load(cestaXml);
+                var turnaje = doc.Descendants("Turnaj").ToList();
 
-            turnaje[volbaSmaz - 1].Remove();
-            doc.Save(xmlFilePath);
-            Console.WriteLine($"Turnaj {turnaje[volbaSmaz - 1]} byl smazán ");
+                Console.Clear();
+
+                if (turnaje.Any())
+                {
+                    for (int i = 0; i < turnaje.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} ");
+                    }
+                    int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
+
+                    turnaje[volbaSmaz - 1].Remove();
+                    doc.Save(cestaXml);
+                    Console.WriteLine($"Turnaj {turnaje[volbaSmaz - 1].Element("Jmeno")?.Value} byl smazán ");
+                }
+                else
+                {
+                    ErrorZprava("Zadne turnaje nejsou ulozeny");
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorZprava($"Chyba pri praci s XML: {e.Message}");
+            }
             Console.ReadKey();
         }
+        static void NactiXml()
+        {
+            try
+            {
+                XDocument doc = XDocument.Load(cestaXml);
+                var turnaje = doc.Descendants("Turnaj").ToList();
+
+                Console.Clear();
+
+                if (turnaje.Any())
+                {
+                    for (int i = 0; i < turnaje.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} ");
+                    }
+                    int volbaVypis = CisloValidace("Napiste cislo turnaje ktere chcete nacist", turnaje.Count);
+
+                    XElement zvolenyTurnaj = turnaje[volbaVypis - 1];
+                    Console.WriteLine($"Jmeno turnaje: {zvolenyTurnaj.Element("Jmeno")?.Value}");
+                    Console.WriteLine($"Liga: {zvolenyTurnaj.Element("Liga")?.Value}");
+                    Console.WriteLine($"Vitez turnaje: {zvolenyTurnaj.Element("Vyherce")?.Value}");
+                    Console.WriteLine($"Lokace: {zvolenyTurnaj.Element("Lokace")?.Element("Zeme")?.Value}, {zvolenyTurnaj.Element("Lokace")?.Element("Mesto")?.Value}");
+                    Console.WriteLine($"Datum konani: {zvolenyTurnaj.Element("Datum")?.Value}");
+                    var zapasy = zvolenyTurnaj.Descendants("Zapas").ToList();
+                    foreach (var zapas in zapasy)
+                    {
+                        Console.WriteLine($"Zapas {zapas.Attribute("Cislo")?.Value}: " +
+                            $"{zapas.Element("Tym_A")?.Value} vs {zapas.Element("Tym_B")?.Value} " +
+                            $"Vitez: {zapas.Element("Vyherce")?.Value} - Delka zapasu: {zapas.Element("Delka_trvani_minuty")?.Value} minut");
+                    }
+                }
+                else
+                {
+                    ErrorZprava("Zadne turnaje nejsou ulozeny");
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorZprava($"Chyba pri praci s XML: {e.Message}");
+            }
+            Console.ReadKey();
+        }
+
         static void UlozXml(TTurnament turnament)
         {
-            //Inicializace XML dokumentu a kořenového elementu
-            XDocument doc;
-            XElement root;
-
-            // Kontrola, zda soubor existuje
-            if (File.Exists(xmlFilePath))
+            try
             {
-                doc = XDocument.Load(xmlFilePath); // Načtení existujícího dokumentu
-                root = doc.Element("Turnaje") ?? new XElement("Turnaje"); // Použij existující nebo vytvoř nový kořen
-            }
-            else
-            {
-                doc = new XDocument(); // Vytvoř nový dokument, pokud neexistuje
-                root = new XElement("Turnaje"); // Vytvoř kořenový element "Turnaje"
-                doc.Add(root); // Přidej kořenový element do dokumentu
-            }
+                XDocument doc;
+                if (File.Exists(cestaXml))
+                {
+                    doc = XDocument.Load(cestaXml);
+                }
+                else
+                {
+                    doc = new XDocument(new XElement("Turnaje"));
+                }
+                XElement root = doc.Element("Turnaje") ?? new XElement("Turnaje");
 
-            // Vytvoření elementu turnaje s všemi detaily
-            XElement turnaj = new XElement("Turnaj",
+                XElement turnaj = new XElement("Turnaj",
                 new XElement("Jmeno", turnament.jmeno),
                 new XElement("Liga", turnament.liga),
                 new XElement("Vyherce", turnament.vyherceTur),
@@ -162,26 +218,27 @@ namespace TLL
                 new XElement("Datum", turnament.datum.ToString("yyyy-MM-dd")),
                 new XElement("Zapasy", new XAttribute("Pocet", turnament.pocetZap.ToString()))
             );
-
-            // Přidání detailů o zápasech do turnaje
-            for (int i = 0; i < turnament.pocetZap; i++)
-            {
-                XElement zapas = new XElement("Zapas",
-                    new XAttribute("Cislo", i + 1),
-                    new XElement("Tym_A", turnament.teamA[i]),
-                    new XElement("Tym_B", turnament.teamB[i]),
-                    new XElement("Vyherce", turnament.vyherceZap[i]),
-                    new XElement("Delka_trvani_minuty", turnament.delkaZap[i].ToString())
-
-                );
-                turnaj.Element("Zapasy").Add(zapas); // Přidej zápas do "Zapasy" v turnaji
+                // Přidání detailů o zápasech do turnaje
+                for (int i = 0; i < turnament.pocetZap; i++)
+                {
+                    XElement zapas = new XElement("Zapas",
+                        new XAttribute("Cislo", i + 1),
+                        new XElement("Tym_A", turnament.teamA[i]),
+                        new XElement("Tym_B", turnament.teamB[i]),
+                        new XElement("Vyherce", turnament.vyherceZap[i]),
+                        new XElement("Delka_trvani_minuty", turnament.delkaZap[i].ToString())
+                    );
+                    turnaj.Add(zapas); // Přidej zápas do "Zapasy" v turnaji
+                }
+                root.Add(turnaj); // Přidej kompletní turnaj do kořenového elementu
+                doc.Save(cestaXml); // Ulož dokument na specifikovanou cestu
+                Console.WriteLine("Turnaj byl úspěšně přidán.");
             }
-
-            root.Add(turnaj); // Přidej kompletní turnaj do kořenového elementu
-            doc.Save(xmlFilePath); // Ulož dokument na specifikovanou cestu
-            Console.WriteLine("Turnaj byl úspěšně přidán.");
+            catch (Exception e)
+            {
+                ErrorZprava($"Chyba pri ukladani turnaje: {e.Message}");
+            }
         }
-
         static string TextValidace(string text)
         {
             string input = "";
@@ -217,7 +274,6 @@ namespace TLL
                 }
             } while (!isValid);
             return datum;
-
         }
 
         static int CisloValidace(string text, int max)
@@ -233,10 +289,10 @@ namespace TLL
                     ErrorZprava("Zadejte prosim cislo, ktere je mensi nebo rovno " + max);
                     check = false;
                 }
-
             } while (!check);
             return input;
         }
+
         static void ErrorZprava(string text)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -252,7 +308,7 @@ namespace TLL
                 Console.WriteLine("EVIDENCE LoL Turnaju ver.1");
                 Console.WriteLine("--------------------------");
                 Console.WriteLine("[N] - NOVY TURNAMENT");
-                Console.WriteLine("[V] - VYPSAT TURNAMENTY");
+                Console.WriteLine("[V] - VYPSAT TURNAMENT");
                 Console.WriteLine("[S] - SMAZAT TURNAMENT");
                 Console.WriteLine("[O] - UMISTENI SOUBORU");
                 Console.WriteLine("[K] - UKONCIT PROGRAM");
@@ -266,18 +322,24 @@ namespace TLL
 
                     case 'N':
                         novyTurnaj = Pridat();
-                        UlozXml(novyTurnaj);   
+                        UlozXml(novyTurnaj);
                         Console.ReadKey();
-
+                        break;
+                    case 'V':
+                        NactiXml();
                         break;
                     case 'K':
                         Environment.Exit(0);
                         break;
                     case 'S':
-                        
+
                         SmazXml();
                         break;
-                    
+                    case 'O':
+                        Console.WriteLine($"\nXML File Location: {cestaXml}");
+                        Console.ReadKey();
+                        break;
+
                     default:
                         Console.Clear();
                         ErrorZprava("Zvolte spravnou moznost");
@@ -286,8 +348,6 @@ namespace TLL
                 }
 
             } while (odpoved != 'K');
-
-
         }
     }
 }
