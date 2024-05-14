@@ -1,5 +1,8 @@
-﻿using System.Globalization;
+﻿using System.Data.Common;
+using System.Globalization;
 using System.Xml.Linq;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 
 namespace TLL
@@ -22,9 +25,9 @@ namespace TLL
             public int[] delkaZap;
             public DateTime datum;
 
-        }
-        private static string nazevXmlSouboru = "Data.xml";
-        private static string cestaXml = Path.Combine(Directory.GetCurrentDirectory(), nazevXmlSouboru);
+        }        
+        private static string cestaXml = Path.Combine(Directory.GetCurrentDirectory(), "Data.xml");
+        private static string cestaXsd = Path.Combine(Directory.GetCurrentDirectory(), "Schema.xsd");
         static TTurnament Pridat()
         {
             TTurnament turnament = new();
@@ -64,7 +67,7 @@ namespace TLL
                     turnament.teamB[i] = B;
 
                     Console.WriteLine("-----------Zvolte VYHERCE Zapasu------------");
-                    Console.WriteLine("[A]" + A + "\n[B]" + B + "\n[D] REMIZA/ZAPAS ZRUSEN");
+                    Console.WriteLine("[A]" + A + "\n[B]" + B + "\n[D] ZAPAS ZRUSEN");
                     do
                     {
                         char switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar);
@@ -79,7 +82,7 @@ namespace TLL
                                 teamCheck = true;
                                 break;
                             case 'D':
-                                turnament.vyherceZap[i] = "DNF";
+                                turnament.vyherceZap[i] = "ZRUSENO";
                                 teamCheck = true;
                                 break;
                             default:
@@ -121,9 +124,11 @@ namespace TLL
         {
             try
             {
+             
                 XDocument doc = XDocument.Load(cestaXml);
+                ValidaceXml(doc);
                 var turnaje = doc.Descendants("Turnaj").ToList();
-
+                
                 Console.Clear();
 
                 if (turnaje.Any())
@@ -134,9 +139,19 @@ namespace TLL
                     }
                     int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
 
-                    turnaje[volbaSmaz - 1].Remove();
-                    doc.Save(cestaXml);
-                    Console.WriteLine($"Turnaj {turnaje[volbaSmaz - 1].Element("Jmeno")?.Value} byl smazán ");
+                    var jmenoTurnaje = turnaje[volbaSmaz - 1].Element("Jmeno")?.Value;
+                     Console.WriteLine($"Doopravdy chcete smazat {jmenoTurnaje}");
+                    char odpovedY = char.ToUpper(Console.ReadKey().KeyChar);
+                    if (odpovedY == 'Y')
+                    {
+                        turnaje[volbaSmaz - 1].Remove();
+                        doc.Save(cestaXml);
+                        Console.WriteLine($"Turnaj {jmenoTurnaje} byl smazan ");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nMazani zruseno");
+                    }
                 }
                 else
                 {
@@ -154,8 +169,9 @@ namespace TLL
             try
             {
                 XDocument doc = XDocument.Load(cestaXml);
+                ValidaceXml(doc);
                 var turnaje = doc.Descendants("Turnaj").ToList();
-
+              
                 Console.Clear();
 
                 if (turnaje.Any())
@@ -228,15 +244,31 @@ namespace TLL
                         new XElement("Vyherce", turnament.vyherceZap[i]),
                         new XElement("Delka_trvani_minuty", turnament.delkaZap[i].ToString())
                     );
-                    turnaj.Add(zapas); // Přidej zápas do "Zapasy" v turnaji
+                    turnaj.Element("Zapasy")?.Add(zapas); ; // Přidej zápas do "Zapasy" v turnaji
                 }
                 root.Add(turnaj); // Přidej kompletní turnaj do kořenového elementu
                 doc.Save(cestaXml); // Ulož dokument na specifikovanou cestu
                 Console.WriteLine("Turnaj byl úspěšně přidán.");
+                
             }
             catch (Exception e)
             {
                 ErrorZprava($"Chyba pri ukladani turnaje: {e.Message}");
+            }
+        }
+        static void ValidaceXml(XDocument doc)
+        {
+            XmlSchemaSet schemaSet = new XmlSchemaSet();
+            schemaSet.Add("",cestaXsd);
+            bool chybaValidace = false;
+            doc.Validate(schemaSet, (o, e) =>
+            {
+                ErrorZprava($"Chyba validace: {e.Message}");
+                chybaValidace = true;
+            });
+            if (chybaValidace)
+            {
+                throw new Exception("XML dokument neodpovida schematu.");
             }
         }
         static string TextValidace(string text)
