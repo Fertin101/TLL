@@ -1,8 +1,6 @@
-﻿using System.Data.Common;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using System.Xml.Serialization;
 
 
 namespace TLL
@@ -25,7 +23,7 @@ namespace TLL
             public int[] delkaZap;
             public DateTime datum;
 
-        }        
+        }
         private static string cestaXml = Path.Combine(Directory.GetCurrentDirectory(), "Data.xml");
         private static string cestaXsd = Path.Combine(Directory.GetCurrentDirectory(), "Schema.xsd");
         static TTurnament Pridat()
@@ -124,11 +122,11 @@ namespace TLL
         {
             try
             {
-             
+
                 XDocument doc = XDocument.Load(cestaXml);
                 ValidaceXml(doc);
                 var turnaje = doc.Descendants("Turnaj").ToList();
-                
+
                 Console.Clear();
 
                 if (turnaje.Any())
@@ -140,7 +138,7 @@ namespace TLL
                     int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
 
                     var jmenoTurnaje = turnaje[volbaSmaz - 1].Element("Jmeno")?.Value;
-                     Console.WriteLine($"Doopravdy chcete smazat {jmenoTurnaje}");
+                    Console.WriteLine($"Doopravdy chcete smazat {jmenoTurnaje}");
                     char odpovedY = char.ToUpper(Console.ReadKey().KeyChar);
                     if (odpovedY == 'Y')
                     {
@@ -171,7 +169,7 @@ namespace TLL
                 XDocument doc = XDocument.Load(cestaXml);
                 ValidaceXml(doc);
                 var turnaje = doc.Descendants("Turnaj").ToList();
-              
+
                 Console.Clear();
 
                 if (turnaje.Any())
@@ -249,7 +247,7 @@ namespace TLL
                 root.Add(turnaj); // Přidej kompletní turnaj do kořenového elementu
                 doc.Save(cestaXml); // Ulož dokument na specifikovanou cestu
                 Console.WriteLine("Turnaj byl úspěšně přidán.");
-                
+
             }
             catch (Exception e)
             {
@@ -259,7 +257,7 @@ namespace TLL
         static void ValidaceXml(XDocument doc)
         {
             XmlSchemaSet schemaSet = new XmlSchemaSet();
-            schemaSet.Add("",cestaXsd);
+            schemaSet.Add("", cestaXsd);
             bool chybaValidace = false;
             doc.Validate(schemaSet, (o, e) =>
             {
