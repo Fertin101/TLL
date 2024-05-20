@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Turnaje>
+	<Turnaj>
+		<Jmeno>Spring Championship</Jmeno>
+		<Liga>Premier League</Liga>
+		<Vyherce>Team Alpha</Vyherce>
+		<Lokace>
+			<Zeme>USA</Zeme>
+			<Mesto>New York</Mesto>
+		</Lokace>
+		<Datum>2024-05-01</Datum>
+		<Zapasy Pocet="2">
+			<Zapas Cislo="1">
+				<Tym_A>Team Alpha</Tym_A>
+				<Tym_B>Team Beta</Tym_B>
+				<Vyherce>Team Alpha</Vyherce>
+				<Delka_trvani_minuty>90</Delka_trvani_minuty>
+			</Zapas>
+			<Zapas Cislo="2">
+				<Tym_A>Team Gamma</Tym_A>
+				<Tym_B>Team Delta</Tym_B>
+				<Vyherce>Team Delta</Vyherce>
+				<Delka_trvani_minuty>85</Delka_trvani_minuty>
+			</Zapas>
+		</Zapasy>
+	</Turnaj>
+	<Turnaj>
+		<Jmeno>Spring Championship</Jmeno>
+		<Liga>Premier League</Liga>
+		<Vyherce>Team Alpha</Vyherce>
+		<Lokace>
+			<Zeme>USA</Zeme>
+			<Mesto>New York</Mesto>
+		</Lokace>
+		<Datum>2024-05-01</Datum>
+		<Zapasy Pocet="2">
+			<Zapas Cislo="1">
+				<Tym_A>Team Alpha</Tym_A>
+				<Tym_B>Team Beta</Tym_B>
+				<Vyherce>Team Alpha</Vyherce>
+				<Delka_trvani_minuty>90</Delka_trvani_minuty>
+			</Zapas>
+			<Zapas Cislo="2">
+				<Tym_A>Team Gamma</Tym_A>
+				<Tym_B>Team Delta</Tym_B>
+				<Vyherce>Team Delta</Vyherce>
+				<Delka_trvani_minuty>85</Delka_trvani_minuty>
+			</Zapas>
+		</Zapasy>
+	</Turnaj>
+	<Turnaj>
+		<Jmeno>Spring Championship</Jmeno>
+		<Liga>Premier League</Liga>
+		<Vyherce>Team Alpha</Vyherce>
+		<Lokace>
+			<Zeme>USA</Zeme>
+			<Mesto>New York</Mesto>
+		</Lokace>
+		<Datum>2024-05-01</Datum>
+		<Zapasy Pocet="2">
+			<Zapas Cislo="1">
+				<Tym_A>Team Alpha</Tym_A>
+				<Tym_B>Team Beta</Tym_B>
+				<Vyherce>Team Alpha</Vyherce>
+				<Delka_trvani_minuty>90</Delka_trvani_minuty>
+			</Zapas>
+			<Zapas Cislo="2">
+				<Tym_A>Team Gamma</Tym_A>
+				<Tym_B>Team Delta</Tym_B>
+				<Vyherce>Team Delta</Vyherce>
+				<Delka_trvani_minuty>85</Delka_trvani_minuty>
+			</Zapas>
+		</Zapasy>
+	</Turnaj>
+	<Turnaj>
+		<Jmeno>Summer Invitational</Jmeno>
+		<Liga>Champions League</Liga>
+		<Vyherce>Team Omega</Vyherce>
+		<Lokace>
+			<Zeme>Germany</Zeme>
+			<Mesto>Berlin</Mesto>
+		</Lokace>
+		<Datum>2024-06-15</Datum>
+		<Zapasy Pocet="3">
+			<Zapas Cislo="1">
+				<Tym_A>Team Epsilon</Tym_A>
+				<Tym_B>Team Zeta</Tym_B>
+				<Vyherce>Team Epsilon</Vyherce>
+				<Delka_trvani_minuty>100</Delka_trvani_minuty>
+			</Zapas>
+			<Zapas Cislo="2">
+				<Tym_A>Team Eta</Tym_A>
+				<Tym_B>Team Theta</Tym_B>
+				<Vyherce>Team Eta</Vyherce>
+				<Delka_trvani_minuty>95</Delka_trvani_minuty>
+			</Zapas>
+			<Zapas Cislo="3">
+				<Tym_A>Team Iota</Tym_A>
+				<Tym_B>Team Kappa</Tym_B>
+				<Vyherce>Team Iota</Vyherce>
+				<Delka_trvani_minuty>110</Delka_trvani_minuty>
+			</Zapas>
+		</Zapasy>
+	</Turnaj>
+</Turnaje>
