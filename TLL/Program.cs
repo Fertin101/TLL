@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.IO;
+using System;
+using System.Globalization;
 using System.Xml.Linq;
 using System.Xml.Schema;
 
@@ -8,6 +10,7 @@ namespace TLL
 
     internal class Program
     {
+        // Struktura pro uchovávání informací o turnaji
         struct TTurnament
         {
             public string jmeno;
@@ -24,15 +27,18 @@ namespace TLL
             public DateTime datum;
 
         }
+        // Cesty k souborům XML a XSD
         private static string cestaXml = Path.Combine(Directory.GetCurrentDirectory(), "Data.xml");
         private static string cestaXsd = Path.Combine(Directory.GetCurrentDirectory(), "Schema.xsd");
+       
+        // Metoda pro přidání nového turnaje
         static TTurnament Pridat()
         {
             TTurnament turnament = new();
             try
             {
                 Console.Clear();
-
+                // Získání a validace základních informací o turnaji
                 turnament.jmeno = TextValidace("Jmeno turnaje");
                 turnament.liga = TextValidace("Jmeno ligy");
                 turnament.zeme = TextValidace("Zeme konani");
@@ -40,15 +46,17 @@ namespace TLL
                 turnament.datum = DatumValidace("Datum zacatku konani");
 
                 Console.Clear();
-
+                // Získání a validace počtu zápasů
                 turnament.pocetZap = CisloValidace("Pocet zapasu v turnaji", 15);
 
+                // Inicializace polí pro týmy, délky zápasů a vítěze zápasů velikost pole je podle počtu zápasů 
                 turnament.teamA = new string[turnament.pocetZap];
                 turnament.teamB = new string[turnament.pocetZap];
                 turnament.delkaZap = new int[turnament.pocetZap];
                 turnament.vyherceZap = new string[turnament.pocetZap];
 
-                for (int i = 0; i < turnament.pocetZap; i++)
+                // Získání a validace informací o jednotlivých zápasech
+                for (int i = 0; i < turnament.pocetZap; i++) // opakuj pro každý zápas
                 {
                     Console.Clear();
 
@@ -58,18 +66,19 @@ namespace TLL
                     Console.WriteLine($"Prave zapisujete hodnoty pro zapas {i + 1}:");
                     Console.WriteLine("Pocet zapasu " + turnament.pocetZap);
                     Console.ForegroundColor = ConsoleColor.White;
-
+                   
+                    // Získání a validace názvů týmů A a B
                     string A = TextValidace("Nazev tymu A");
                     turnament.teamA[i] = A;
                     string B = TextValidace("Nazev tymu B");
                     turnament.teamB[i] = B;
-
+                    //menu pro výběr vítěze zápasu, lze zvolit pouze předem dáné tymy
                     Console.WriteLine("-----------Zvolte VYHERCE Zapasu------------");
                     Console.WriteLine("[A]" + A + "\n[B]" + B + "\n[D] ZAPAS ZRUSEN");
                     do
                     {
-                        char switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar);
-                        switch (switchOdpoved)
+                        char switchOdpoved = char.ToUpper(Console.ReadKey().KeyChar); // Čtení vstupu od uživatele a konverze na velké písmeno
+                        switch (switchOdpoved) 
                         {
                             case 'A':
                                 turnament.vyherceZap[i] = A;
@@ -88,24 +97,25 @@ namespace TLL
                                 break;
                         }
                     } while (!teamCheck);
-
+                    //  Získání a validace délky zápasu
                     int delka = CisloValidace("Delka zapasu v minuach", 120);
                     turnament.delkaZap[i] = delka;
                 }
+                // Výběr vítěze turnaje z vítězů zápasů
                 bool vyherceCheck = false;
                 do
                 {
                     Console.Clear();
 
-                    for (int i = 0; i < turnament.pocetZap; i++)
+                    for (int i = 0; i < turnament.pocetZap; i++)  // Smyčka pro zobrazení všech vítězů zápasů
                     {
-                        Console.WriteLine($"{i + 1}. {turnament.vyherceZap[i]}");
+                        Console.WriteLine($"{i + 1}. {turnament.vyherceZap[i]}"); // Zobrazení vítězů jednotlivých zápasů
                     }
 
                     int volbaVyh = CisloValidace($"Cislo Vyherce Turnamentu [1-{turnament.pocetZap}]", turnament.pocetZap);
                     if (volbaVyh <= turnament.pocetZap && volbaVyh > 0)
                     {
-                        turnament.vyherceTur = turnament.vyherceZap[volbaVyh - 1];
+                        turnament.vyherceTur = turnament.vyherceZap[volbaVyh - 1]; // Nastavení vítěze turnaje
                         vyherceCheck = true;
                     }
 
@@ -118,37 +128,39 @@ namespace TLL
                 return default;
             }
         }
+        // Metoda pro smazání turnaje z XML souboru
         static void SmazXml()
         {
             try
             {
-
+                // Načtení XML dokumentu
                 XDocument doc = XDocument.Load(cestaXml);
-                ValidaceXml(doc);
-                var turnaje = doc.Descendants("Turnaj").ToList();
+               
+                var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
 
                 Console.Clear();
 
-                if (turnaje.Any())
+                if (turnaje.Count != 0) // Kontrola, zda existují nějaké turnaje
                 {
+                    ValidaceXml(doc); // Validace XML dokumentu
                     for (int i = 0; i < turnaje.Count; i++)
                     {
-                        Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} ");
+                        Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} "); // Zobrazení pořadí a názvu turnaje
                     }
                     int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
 
-                    var jmenoTurnaje = turnaje[volbaSmaz - 1].Element("Jmeno")?.Value;
-                    Console.WriteLine($"Doopravdy chcete smazat {jmenoTurnaje}");
-                    char odpovedY = char.ToUpper(Console.ReadKey().KeyChar);
+                    var jmenoTurnaje = turnaje[volbaSmaz - 1].Element("Jmeno")?.Value; 
+                    ErrorZprava($"\n[Y] - Doopravdy chcete smazat {jmenoTurnaje}");
+                    char odpovedY = char.ToUpper(Console.ReadKey().KeyChar); // Kontrola, zda uživatel chce doopravdy smazat turnaj
                     if (odpovedY == 'Y')
                     {
-                        turnaje[volbaSmaz - 1].Remove();
+                        turnaje[volbaSmaz - 1].Remove(); // Smazání vybraného turnaje z XML dokumentu
                         doc.Save(cestaXml);
-                        Console.WriteLine($"Turnaj {jmenoTurnaje} byl smazan ");
+                        Console.WriteLine($"\nTurnaj {jmenoTurnaje} byl smazan ");
                     }
                     else
                     {
-                        Console.WriteLine("\nMazani zruseno");
+                        ErrorZprava("\nMazani zruseno");
                     }
                 }
                 else
@@ -162,32 +174,36 @@ namespace TLL
             }
             Console.ReadKey();
         }
+        // Metoda pro načtení turnaje z XML souboru
         static void NactiXml()
         {
             try
             {
+                // Načtení XML dokumentu
                 XDocument doc = XDocument.Load(cestaXml);
-                ValidaceXml(doc);
-                var turnaje = doc.Descendants("Turnaj").ToList();
+               
+                var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
 
                 Console.Clear();
 
-                if (turnaje.Any())
+                if (turnaje.Count != 0) // Kontrola, zda existují nějaké turnaje
                 {
-                    for (int i = 0; i < turnaje.Count; i++)
+                    ValidaceXml(doc); // Validace XML dokumentu
+                    for (int i = 0; i < turnaje.Count; i++)  // Smyčka pro zobrazení všech turnajů
                     {
                         Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} ");
                     }
-                    int volbaVypis = CisloValidace("Napiste cislo turnaje ktere chcete nacist", turnaje.Count);
+                    int volbaVypis = CisloValidace("Napiste cislo turnaje ktere chcete nacist", turnaje.Count); // Získání a validace výběru turnaje k načtení
 
-                    XElement zvolenyTurnaj = turnaje[volbaVypis - 1];
+                    // Ziskání určítého turnaje a jeho výpis
+                    XElement zvolenyTurnaj = turnaje[volbaVypis - 1]; 
                     Console.WriteLine($"Jmeno turnaje: {zvolenyTurnaj.Element("Jmeno")?.Value}");
                     Console.WriteLine($"Liga: {zvolenyTurnaj.Element("Liga")?.Value}");
                     Console.WriteLine($"Vitez turnaje: {zvolenyTurnaj.Element("Vyherce")?.Value}");
                     Console.WriteLine($"Lokace: {zvolenyTurnaj.Element("Lokace")?.Element("Zeme")?.Value}, {zvolenyTurnaj.Element("Lokace")?.Element("Mesto")?.Value}");
                     Console.WriteLine($"Datum konani: {zvolenyTurnaj.Element("Datum")?.Value}");
                     var zapasy = zvolenyTurnaj.Descendants("Zapas").ToList();
-                    foreach (var zapas in zapasy)
+                    foreach (var zapas in zapasy) // smyčka pro každý zapas
                     {
                         Console.WriteLine($"Zapas {zapas.Attribute("Cislo")?.Value}: " +
                             $"{zapas.Element("Tym_A")?.Value} vs {zapas.Element("Tym_B")?.Value} " +
@@ -205,12 +221,13 @@ namespace TLL
             }
             Console.ReadKey();
         }
-
+        // Metoda pro uložení turnaje do XML souboru
         static void UlozXml(TTurnament turnament)
         {
             try
             {
                 XDocument doc;
+                //pokud´ existuje XML soubor tak se načte, zda ne vytoří se nový XML soubor s kořenovým elemetem Turnaje
                 if (File.Exists(cestaXml))
                 {
                     doc = XDocument.Load(cestaXml);
@@ -219,8 +236,10 @@ namespace TLL
                 {
                     doc = new XDocument(new XElement("Turnaje"));
                 }
-                XElement root = doc.Element("Turnaje") ?? new XElement("Turnaje");
-
+                
+            
+                XElement root = doc.Element("Turnaje") ?? new XElement("Turnaje"); // Získání kořenového elementu nebo vytvoření nového
+                // Vytvoření elementu "Turnaj" s detaily o turnaji
                 XElement turnaj = new XElement("Turnaj",
                 new XElement("Jmeno", turnament.jmeno),
                 new XElement("Liga", turnament.liga),
@@ -254,21 +273,23 @@ namespace TLL
                 ErrorZprava($"Chyba pri ukladani turnaje: {e.Message}");
             }
         }
+        // Metoda pro validaci XML dokumentu pomocí XSD schématu
         static void ValidaceXml(XDocument doc)
         {
-            XmlSchemaSet schemaSet = new XmlSchemaSet();
-            schemaSet.Add("", cestaXsd);
+            XmlSchemaSet schemaSet = new XmlSchemaSet(); // Vytvoření nové sady schémat XML
+            schemaSet.Add("", cestaXsd); // Přidání XSD schématu do sady schémat
             bool chybaValidace = false;
-            doc.Validate(schemaSet, (o, e) =>
+            doc.Validate(schemaSet, (o, e) => //lambda validationEventHandler
             {
                 ErrorZprava($"Chyba validace: {e.Message}");
                 chybaValidace = true;
             });
             if (chybaValidace)
             {
-                throw new Exception("XML dokument neodpovida schematu.");
+                throw new Exception("XML dokument neodpovida schematu."); // Vyvolání výjimky v případě, že dokument neodpovídá schématu
             }
         }
+        // Metoda pro validaci textu od uživatele
         static string TextValidace(string text)
         {
             string input = "";
@@ -277,7 +298,7 @@ namespace TLL
             {
                 Console.WriteLine("\nZadejte " + text + ":");
                 input = Console.ReadLine() ?? "";
-                if (string.IsNullOrWhiteSpace(input))
+                if (string.IsNullOrWhiteSpace(input)) // pokud je input nic nebo jen mezery program se dal nepusti
                 {
                     ErrorZprava("Prosim vyplnte udaj");
                 }
@@ -288,7 +309,7 @@ namespace TLL
             }
             return input;
         }
-
+        // Metoda pro validaci data od uživatele
         static DateTime DatumValidace(string text)
         {
             DateTime datum;
@@ -297,7 +318,7 @@ namespace TLL
 
             {
                 Console.Write(text + "(DD/MM/YYYY):");
-                isValid = DateTime.TryParseExact(Console.ReadLine(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum);
+                isValid = DateTime.TryParseExact(Console.ReadLine(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum); // Parsování datumu, specifický formát dd/MM/yyyy, ingoruje nastavení pc uživatele, arsování proběhne striktně podle zadaného formátu bez jakýchkoli úprav
                 if (!isValid)
                 {
                     ErrorZprava("Prosim zadejte spravne datum napr.(20/08/2024)");
@@ -305,7 +326,7 @@ namespace TLL
             } while (!isValid);
             return datum;
         }
-
+        // Metoda pro validaci čísla od uživatele
         static int CisloValidace(string text, int max)
         {
             int input;
@@ -313,8 +334,8 @@ namespace TLL
             do
             {
                 Console.WriteLine("\nZadejte " + text + ":");
-                check = int.TryParse(Console.ReadLine(), out input);
-                if (!check || input > max || input < 1)
+                check = int.TryParse(Console.ReadLine(), out input); // parsování čísla
+                if (!check || input > max || input < 1) // číslo musí být větší než nula a menší než zadané maximum. Musí splnit parsování
                 {
                     ErrorZprava("Zadejte prosim cislo, ktere je mensi nebo rovno " + max);
                     check = false;
@@ -322,38 +343,40 @@ namespace TLL
             } while (!check);
             return input;
         }
-
+        // Metoda pro zobrazení chybové zprávy
         static void ErrorZprava(string text)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Red; // Nastavení barvy textu na červenou
             Console.WriteLine(text);
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.White; // Nastavení barvy textu zpět na bílou
+        
         }
+        // Hlavní metoda programu - MENU
         static void Main(string[] args)
         {
-            char odpoved;
+            char odpoved; // Proměnná pro uložení volby uživatele
             do
             {
                 Console.Clear();
+                // Zobrazení menu
                 Console.WriteLine("EVIDENCE LoL Turnaju ver.1");
                 Console.WriteLine("--------------------------");
                 Console.WriteLine("[N] - NOVY TURNAMENT");
                 Console.WriteLine("[V] - VYPSAT TURNAMENT");
                 Console.WriteLine("[S] - SMAZAT TURNAMENT");
-                Console.WriteLine("[O] - UMISTENI SOUBORU");
                 Console.WriteLine("[K] - UKONCIT PROGRAM");
                 Console.WriteLine("--------------------------");
 
-                odpoved = char.ToUpper(Console.ReadKey().KeyChar);
+                odpoved = char.ToUpper(Console.ReadKey().KeyChar); // Čtení vstupu od uživatele a konverze na velké písmeno
 
                 TTurnament novyTurnaj;
                 switch (odpoved)
                 {
 
                     case 'N':
-                        novyTurnaj = Pridat();
-                        UlozXml(novyTurnaj);
-                        Console.ReadKey();
+                        novyTurnaj = Pridat(); // Vytvoření nového turnaje
+                        UlozXml(novyTurnaj);  // Uložení nového turnaje do XML souboru
+                        Console.ReadKey();   
                         break;
                     case 'V':
                         NactiXml();
@@ -365,10 +388,6 @@ namespace TLL
 
                         SmazXml();
                         break;
-                    case 'O':
-                        Console.WriteLine($"\nXML File Location: {cestaXml}");
-                        Console.ReadKey();
-                        break;
 
                     default:
                         Console.Clear();
@@ -377,7 +396,7 @@ namespace TLL
                         break;
                 }
 
-            } while (odpoved != 'K');
+            } while (odpoved != 'K'); // Opakování cyklu dokud uživatel nezvolí ukončení programu
         }
     }
 }

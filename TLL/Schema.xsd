@@ -3,7 +3,7 @@
 	<xs:element name="Turnaje">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="Turnaj" minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="Turnaj" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Jmeno" type="xs:string"/>
@@ -21,7 +21,7 @@
 							<xs:element name="Zapasy">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="Zapas" minOccurs="1" maxOccurs="unbounded">
+										<xs:element name="Zapas" maxOccurs="unbounded">
 											<xs:complexType>
 												<xs:sequence>
 													<xs:element name="Tym_A" type="xs:string"/>
@@ -29,11 +29,11 @@
 													<xs:element name="Vyherce" type="xs:string"/>
 													<xs:element name="Delka_trvani_minuty" type="xs:integer"/>
 												</xs:sequence>
-												<xs:attribute name="Cislo" type="xs:integer" use="required"/>
+												<xs:attribute name="Cislo" type="xs:integer"/>
 											</xs:complexType>
 										</xs:element>
 									</xs:sequence>
-									<xs:attribute name="Pocet" type="xs:integer" use="required"/>
+									<xs:attribute name="Pocet" type="xs:integer"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
