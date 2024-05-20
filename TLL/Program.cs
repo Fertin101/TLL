@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System;
+using System.Linq;
 using System.Globalization;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -135,14 +136,11 @@ namespace TLL
             {
                 // Načtení XML dokumentu
                 XDocument doc = XDocument.Load(cestaXml);
-               
+                ValidaceXml(doc); // Validace XML dokumentu
                 var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
 
                 Console.Clear();
 
-                if (turnaje.Count != 0) // Kontrola, zda existují nějaké turnaje
-                {
-                    ValidaceXml(doc); // Validace XML dokumentu
                     for (int i = 0; i < turnaje.Count; i++)
                     {
                         Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} "); // Zobrazení pořadí a názvu turnaje
@@ -161,12 +159,7 @@ namespace TLL
                     else
                     {
                         ErrorZprava("\nMazani zruseno");
-                    }
-                }
-                else
-                {
-                    ErrorZprava("Zadne turnaje nejsou ulozeny");
-                }
+                    }         
             }
             catch (Exception e)
             {
@@ -181,14 +174,13 @@ namespace TLL
             {
                 // Načtení XML dokumentu
                 XDocument doc = XDocument.Load(cestaXml);
-               
+                ValidaceXml(doc); // Validace XML dokumentu
                 var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
 
                 Console.Clear();
 
-                if (turnaje.Count != 0) // Kontrola, zda existují nějaké turnaje
-                {
-                    ValidaceXml(doc); // Validace XML dokumentu
+             
+                    
                     for (int i = 0; i < turnaje.Count; i++)  // Smyčka pro zobrazení všech turnajů
                     {
                         Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} ");
@@ -208,12 +200,7 @@ namespace TLL
                         Console.WriteLine($"Zapas {zapas.Attribute("Cislo")?.Value}: " +
                             $"{zapas.Element("Tym_A")?.Value} vs {zapas.Element("Tym_B")?.Value} " +
                             $"Vitez: {zapas.Element("Vyherce")?.Value} - Delka zapasu: {zapas.Element("Delka_trvani_minuty")?.Value} minut");
-                    }
-                }
-                else
-                {
-                    ErrorZprava("Zadne turnaje nejsou ulozeny");
-                }
+                    }        
             }
             catch (Exception e)
             {
@@ -286,7 +273,7 @@ namespace TLL
             });
             if (chybaValidace)
             {
-                throw new Exception("XML dokument neodpovida schematu."); // Vyvolání výjimky v případě, že dokument neodpovídá schématu
+                throw new Exception("dokument neodpovida schematu, nebo nemate zadny turnaj ulozen"); // Vyvolání výjimky v případě, že dokument neodpovídá schématu
             }
         }
         // Metoda pro validaci textu od uživatele
