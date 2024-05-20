@@ -134,12 +134,14 @@ namespace TLL
         {
             try
             {
-                // Načtení XML dokumentu
-                XDocument doc = XDocument.Load(cestaXml);
-                ValidaceXml(doc); // Validace XML dokumentu
-                var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
+                if (File.Exists(cestaXml))
+                {
+                    // Načtení XML dokumentu
+                    XDocument doc = XDocument.Load(cestaXml);
+                    ValidaceXml(doc); // Validace XML dokumentu
+                    var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
 
-                Console.Clear();
+                    Console.Clear();
 
                     for (int i = 0; i < turnaje.Count; i++)
                     {
@@ -147,7 +149,7 @@ namespace TLL
                     }
                     int volbaSmaz = CisloValidace("Napiste cislo turnaje ktere chcete smazat", turnaje.Count);
 
-                    var jmenoTurnaje = turnaje[volbaSmaz - 1].Element("Jmeno")?.Value; 
+                    var jmenoTurnaje = turnaje[volbaSmaz - 1].Element("Jmeno")?.Value;
                     ErrorZprava($"\n[Y] - Doopravdy chcete smazat {jmenoTurnaje}");
                     char odpovedY = char.ToUpper(Console.ReadKey().KeyChar); // Kontrola, zda uživatel chce doopravdy smazat turnaj
                     if (odpovedY == 'Y')
@@ -159,7 +161,12 @@ namespace TLL
                     else
                     {
                         ErrorZprava("\nMazani zruseno");
-                    }         
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Soubor XML neexistuje");
+                }
             }
             catch (Exception e)
             {
@@ -172,15 +179,16 @@ namespace TLL
         {
             try
             {
-                // Načtení XML dokumentu
-                XDocument doc = XDocument.Load(cestaXml);
-                ValidaceXml(doc); // Validace XML dokumentu
-                var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
+                if (File.Exists(cestaXml)) {
+                    // Načtení XML dokumentu
+                    XDocument doc = XDocument.Load(cestaXml);
+                    ValidaceXml(doc); // Validace XML dokumentu
+                    var turnaje = doc.Descendants("Turnaj").ToList(); // Načtení seznamu turnajů z XML
 
-                Console.Clear();
+                    Console.Clear();
 
-             
-                    
+
+
                     for (int i = 0; i < turnaje.Count; i++)  // Smyčka pro zobrazení všech turnajů
                     {
                         Console.WriteLine($"{i + 1} - {turnaje[i].Element("Jmeno")?.Value} ");
@@ -188,7 +196,7 @@ namespace TLL
                     int volbaVypis = CisloValidace("Napiste cislo turnaje ktere chcete nacist", turnaje.Count); // Získání a validace výběru turnaje k načtení
 
                     // Ziskání určítého turnaje a jeho výpis
-                    XElement zvolenyTurnaj = turnaje[volbaVypis - 1]; 
+                    XElement zvolenyTurnaj = turnaje[volbaVypis - 1];
                     Console.WriteLine($"Jmeno turnaje: {zvolenyTurnaj.Element("Jmeno")?.Value}");
                     Console.WriteLine($"Liga: {zvolenyTurnaj.Element("Liga")?.Value}");
                     Console.WriteLine($"Vitez turnaje: {zvolenyTurnaj.Element("Vyherce")?.Value}");
@@ -200,8 +208,13 @@ namespace TLL
                         Console.WriteLine($"Zapas {zapas.Attribute("Cislo")?.Value}: " +
                             $"{zapas.Element("Tym_A")?.Value} vs {zapas.Element("Tym_B")?.Value} " +
                             $"Vitez: {zapas.Element("Vyherce")?.Value} - Delka zapasu: {zapas.Element("Delka_trvani_minuty")?.Value} minut");
-                    }        
-            }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Soubor XML neexistuje");
+                }
+                }
             catch (Exception e)
             {
                 ErrorZprava($"Chyba pri praci s XML: {e.Message}");
